@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Dosis|Raleway|Comfortaa|Satisfy" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+        {% block css %}
+        {% endblock %}
+        <title>{% block title %}{% endblock %} - dicerrr</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="{% url 'index' %}" style="font-family: 'Comfortaa', cursive;">
+                <img src="{% static 'admin/img/dice-navbar.png' %}" width="30" height="30" class="d-inline-block align-top mr-1" alt="">dicerrr
+            </a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <ul class="navbar-nav mr-auto mt-2 mt-sm-0">
+                  <li class="nav-item">
+                    <a class="nav-item nav-link" href="{% url 'upload' %}">Create</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-item nav-link" href="{% url 'my_uploads' %}">My Creations</a>
+                  </li>
+
+                  {% if user.username == "mutatedllama" %}
+                  <li class="nav-item">
+                    <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
+                  </li>
+                  {% endif %}
+                </ul>
+
+            </div>
+        </nav>
+
+        <div class="container">
+          <div class="row justify-content-center" style="font-family: 'Raleway', sans-serif;">
+            <div class="col-12">
+              <h1 class="mt-2 text-center">{% block h1 %}{% endblock %}</h1>
+              <hr class="mt-0 mb-4">
+              {% block content %}
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script>
+            $(function(){
+                $('a').each(function(){
+                    if ($(this).prop('href') == window.location.href) {
+                        $(this).addClass('active'); $(this).parents('li').addClass('active');
+                    }
+                });
+            });
+        </script>
+    {% block javascript %}
+    {% endblock %}
+    </body>
+</html>

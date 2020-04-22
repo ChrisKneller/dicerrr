@@ -1,0 +1,71 @@
+{% extends 'dice/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load dice_extras %}
+
+{% block title %}
+My Creations
+{% endblock %}
+{% block h1 %}
+My Creations
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<div id="image-box" class="container-fluid mx-auto px-auto" style="text-align:center;">
+{% if number_of_pages == 0 %}<p>You haven't created anything yet! Try it out <a href="{% url 'upload' %}">here</a>.</p>{% endif %}
+<p>
+    <a href="/share/{{dice_objects.0.image_id}}" target="_blank">
+        <img id="dice-img" "/share/{{dice_objects.0.image_id}}" style="max-height:30vh" src="{{dice_urls.0}}">
+    </a>
+</p>
+<p>
+    <a href="/share/{{dice_objects.1.image_id}}" target="_blank">
+        <img id="dice-img" "/share/{{dice_objects.1.image_id}}" style="max-height:30vh" src="{{dice_urls.1}}">
+    </a>
+</p>
+<p>
+    <a href="/share/{{dice_objects.2.image_id}}" target="_blank">
+        <img id="dice-img" "/share/{{dice_objects.2.image_id}}" style="max-height:30vh" src="{{dice_urls.2}}">
+    </a>
+</p>
+<p>
+    <a href="/share/{{dice_objects.3.image_id}}" target="_blank">
+        <img id="dice-img" "/share/{{dice_objects.3.image_id}}" style="max-height:30vh" src="{{dice_urls.3}}">
+    </a>
+</p>
+<p>
+    <a href="/share/{{dice_objects.4.image_id}}" target="_blank">
+        <img id="dice-img" "/share/{{dice_objects.4.image_id}}" style="max-height:30vh" src="{{dice_urls.4}}">
+    </a>
+</p>
+
+</div>
+
+<div class="row text-center my-4">
+    <div class="col-sm">
+        {% if page > 2 %}<a href="{% url 'my_uploads' %}1">&lt;&lt;</a>{% endif %}
+    </div>
+    <div class="col-sm">
+        {% if page > 1 %}<a href="{% url 'my_uploads' %}{{ page|add:'-1' }}">&lt;</a>{% endif %}
+    </div>
+    <div class="col-sm lead">
+        {% if number_of_pages > 0 %}Page {{ page }} of {{ number_of_pages }}{% endif %}
+    </div>
+    <div class="col-sm">
+        {% if page < number_of_pages %}<a href="{% url 'my_uploads' %}{{ page|add:'+1' }}">&gt;</a>{% endif %}
+    </div>
+    <div class="col-sm">
+        {% if page < number_of_pages|add:"-1" %}<a href="{% url 'my_uploads' %}{{ number_of_pages }}">&gt;&gt;</a>{% endif %}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

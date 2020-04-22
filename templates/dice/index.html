@@ -1,0 +1,35 @@
+{% extends 'dice/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load dice_extras %}
+
+{% block title %}
+Welcome to dicerrr
+{% endblock %}
+{% block h1 %}
+Do you feel lucky?
+{% endblock %}
+
+{% block css %}
+<style>
+    .quote{
+        font-family: 'Satisfy', cursive;
+        font-size: 1.4em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="text-center quote">
+    You can prepare all you want, but if you never roll the dice you'll never be successful.
+</div>
+<div class="text-center my-3">
+        <a class="btn btn-dark text-center" href="{% url 'upload' %}">Roll the dice</a>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

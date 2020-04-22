@@ -1,0 +1,514 @@
+{% extends 'dice/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load dice_extras %}
+
+{% block title %}
+Create
+{% endblock %}
+{% block h1 %}
+Upload your image and roll the dice
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
+<link rel="stylesheet" href="{% static 'css/ajax-upload.css' %}">
+
+<style>
+/*@import url(https://fonts.googleapis.com/css?family=Roboto:300,400);*/
+
+
+
+/*h1 small{*/
+/*  display: block;*/
+/*  font-size: 18px;*/
+/*  text-transform: none;*/
+/*  letter-spacing: 1.5px;*/
+/*  margin-top: 12px;*/
+/*}*/
+/*.row{*/
+/*  max-width: 950px;*/
+/*  margin: 0 auto;*/
+/*}*/
+/*.btn{*/
+/*  white-space: normal;*/
+/*}*/
+/*.button-wrap {*/
+/*  position: relative;*/
+/*  text-align: center;*/
+/*  .btn {*/
+/*    font-family: 'Roboto', sans-serif;*/
+/*    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.5);*/
+/*    border-radius: 0px;*/
+/*    border-color: #222;*/
+/*    cursor: pointer;*/
+/*    text-transform: uppercase;*/
+/*    font-size: 1.1em;*/
+/*    font-weight: 400;*/
+/*    letter-spacing: 1px;*/
+/*    small {*/
+/*      font-size: 0.8rem;*/
+/*      letter-spacing: normal;*/
+/*      text-transform: none;*/
+/*    }*/
+/*  }*/
+/*}*/
+
+
+/** SPINNER CREATION **/
+
+/*.loader {*/
+/*  position: relative;*/
+/*  text-align: center;*/
+/*  margin: 15px auto;*/
+/*  z-index: 9999;*/
+/*  display: block;*/
+  /*width: 80px;*/
+  /*height: 80px;*/
+  /*border: 10px solid rgba(0, 0, 0, .3);*/
+  /*border-radius: 50%;*/
+  /*border-top-color: #000;*/
+  /*animation: spin 1s ease-in-out infinite;*/
+  /*-webkit-animation: spin 1s ease-in-out infinite;*/
+/*}*/
+
+/*@keyframes spin {*/
+/*  to {*/
+/*    -webkit-transform: rotate(360deg);*/
+/*  }*/
+/*}*/
+
+/*@-webkit-keyframes spin {*/
+/*  to {*/
+/*    -webkit-transform: rotate(360deg);*/
+/*  }*/
+/*}*/
+
+
+/** MODAL STYLING **/
+
+/*.modal-content {*/
+/*  border-radius: 0px;*/
+/*  box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);*/
+/*}*/
+
+/*.modal-backdrop.show {*/
+/*  opacity: 0.75;*/
+/*}*/
+
+/*.loader-txt {*/
+/*  p {*/
+/*    font-size: 13px;*/
+/*    color: #666;*/
+/*    small {*/
+/*      font-size: 11.5px;*/
+/*      color: #999;*/
+/*    }*/
+/*  }*/
+/*}*/
+
+/*#output {*/
+/*  padding: 25px 15px;*/
+/*  background: #222;*/
+/*  border: 1px solid #222;*/
+/*  max-width: 350px;*/
+/*  margin: 35px auto;*/
+/*  font-family: 'Roboto', sans-serif !important;*/
+/*  p.subtle {*/
+/*    color: #555;*/
+/*    font-style: italic;*/
+/*    font-family: 'Roboto', sans-serif !important;*/
+/*  }*/
+/*  h4 {*/
+/*    font-weight: 300 !important;*/
+/*    font-size: 1.1em;*/
+/*    font-family: 'Roboto', sans-serif !important;*/
+/*  }*/
+/*  p {*/
+/*    font-family: 'Roboto', sans-serif !important;*/
+/*    font-size: 0.9em;*/
+/*    b {*/
+/*      text-transform: uppercase;*/
+/*      text-decoration: underline;*/
+/*    }*/
+/*  }*/
+/*}*/
+
+/*.table td, .table th {*/
+/*    vertical-align:middle;*/
+/*}*/
+
+/*.table td {*/
+    /*text-align:center;*/
+/*}*/
+
+/*.table tbody tr:last-child td, .table tbody tr:last-child th {*/
+/*    border-left:0;*/
+/*    border-right:0;*/
+/*    border-bottom:0;*/
+/*}*/
+
+/*.table {*/
+/*    border-bottom:0;*/
+/*}*/
+
+/*.table tbody tr:last-child {*/
+/*    border:0;*/
+/*}*/
+
+/*.hidden{*/
+/*    display:none;*/
+/*}*/
+
+</style>
+
+
+{% endblock %}
+
+{% block content %}
+{# 1. BUTTON TO TRIGGER THE ACTION #}
+<div class="container-fluid text-muted text-center btn btn-light js-upload-photos
+    mx-auto" style="padding-top: 4rem; padding-bottom: 4rem; cursor: pointer;"
+    id="upload-box">
+  <p><i class="fas fa-file-upload" style="font-size:4rem;"></i></p>
+  <h4>Click here or simply drag and drop to upload</h4>
+</div>
+<div class="container-fluid mx-auto px-0 mb-4" id="image-box" style="text-align:center;"></div>
+
+
+{# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
+<input id="fileupload" type="file" name="file" multiple
+       style="display: none;"
+       data-url="{% url 'upload' %}"
+       data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+
+{# 2.5 BUTTON TO SEND AJAX REQUEST FOR DICE TRANSFORM #}
+<div class="" id="create-art-section" style="display:none;">
+    <div class="row">
+        <label for="number-of-dice" class="mx-auto">No. dice to use (approx)</label>
+    </div>
+    <div class="row">
+        <input type="number" class="form-control col-auto mb-2 text-center mx-auto" style="width:auto!important" id="number-of-dice" placeholder="defaults to 10000">
+    </div>
+    <div class="row">
+        <button type="button" class="btn btn-dark mx-auto mb-4" id="create-art">Create my art</button>
+    </div>
+</div>
+
+{# 3. TABLE TO DISPLAY THE UPLOADED PHOTOS #}
+<table id="gallery" class="table table-bordered" style="display:none">
+  <thead>
+    <tr>
+      <th>Photo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for photo in photos %}
+      <tr>
+        <td><a href="{{ photo.file.url }}">{{ photo.file.name }}</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# 3.5 TABLE FOR DICE IMAGES #}
+
+{% for dice in dice_types %}
+<div id="size-{{dice.dice_size}}-cost" class="hidden">{{dice.dice_cost}}</div>
+{% endfor %}
+<div id="size-x-height" class="hidden">108</div>
+<div id="size-x-width" class="hidden">192</div>
+
+<div class="row hidden buy-buttons text-center">
+    <button type="button" class="btn btn-dark btn-lg mb-2" id="share-page">Share this page</button>
+</div>
+<div class="row hidden my-2 text-center" id="share-box">
+    <input type="text" style="font-size:0.7em" value="" id="share-url" class="col-8">
+    <button type="button" class="btn btn-dark btn-sm col-auto" id="copy-url" data-clipboard-target="#share-url" aria-label="Text copied!">Copy text</button>
+</div>
+<!--<div class="row hidden buy-buttons">-->
+<!--    <button type="button" class="btn btn-dark btn-lg btn-block mt-2" id="buy-art">Buy artwork</button>-->
+<!--</div>-->
+
+<!--<table class="table ttable-sm hidden" id="dice-img-data">-->
+<!--<thead>-->
+<!--    <tr id="dice-size">-->
+<!--        <th id="dice-size-heading" scope="col">Select your dice size</th>-->
+<!--        <th id="dice-size-content" scope="col">-->
+<!--          <div class="form-row">-->
+<!--          <div class="col">-->
+<!--            <select class="custom-select mr-sm-2 pr-2" id="inlineFormCustomSelect dice-selector">-->
+<!--                <option selected value={{dice_types.0.dice_size}}>{{dice_types.0.dice_size}}</option>-->
+<!--                {% for dice in dice_types|slice:"1:" %}-->
+<!--                    <option value="{{dice.dice_size}}">{{dice.dice_size}}</option>-->
+<!--                {% endfor %}-->
+<!--            </select>-->
+<!--          </div>-->
+<!--          <div class="col pt-2">mm&sup3;</div>-->
+<!--          </div>-->
+<!--        </th>-->
+<!--    </tr>-->
+<!--</thead>-->
+<!--<tbody>-->
+<!--    <tr id="no-dice">-->
+<!--        <th id="no-dice-heading" scope="row">No. dice required</th>-->
+<!--        <td id="no-dice-content">20736</td>-->
+<!--    </tr>-->
+<!--    <tr id="dice-height">-->
+<!--        <th id="dice-height-heading" scope="row">Height of piece</th>-->
+<!--        <td id="dice-height-content">[0.008*100]m</td>-->
+<!--    </tr>-->
+<!--    <tr id="dice-width">-->
+<!--        <th id="dice-width-heading" scope="row">Width of piece</th>-->
+<!--        <td id="dice-width-content">[0.008*100]m</td>-->
+<!--    </tr>-->
+<!--    <tr id="dice-f-price">-->
+<!--        <th id="dice-f-price-header" scope="row">Total cost of dice</th>-->
+<!--        <td id="dice-f-price-content">£[10000*0.1]</td>-->
+<!--    </tr>-->
+<!--    <tr id="dice-cost">-->
+<!--        <th id="dice-cost-header" scope="row">Cost per dice</th>-->
+<!--        <td id="dice-cost-content">{{dice_types.0.dice_cost}}p</td>-->
+<!--    </tr>-->
+<!--</tbody>-->
+<!--</table>-->
+
+
+{# MODAL LOADING BAR #}
+<div class="modal fade my-auto" id="modal-progress" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Uploading...</h4>
+      </div>
+      <div class="modal-body">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# MODAL DICE SPINNER #}
+<div class="modal fade my-auto" id="loadMe" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div class="loader"><img style="max-width:50px;" src="https://s3.eu-west-2.amazonaws.com/diceart-media/static/img/Dice-1.5s-200px.svg"></div>
+        <div clas="loader-txt">
+          <p>We are currently converting your image to dice. <br><br><small>Be patient. It will be worth it.</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+    {# jQuery file upload scripts #}
+    <script src="{% static 'js/jQuery-File-Upload-9.14.1/js/vendor/jquery.ui.wudget.js' %}"></script>
+    <script src="{% static 'js/jQuery-File-Upload-9.14.1/js/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'js/jQuery-File-Upload-9.14.1/js/jquery.fileupload.js' %}"></script>
+
+    {# jQuery file upload scripts #}
+    {# <script src="{% static 'js/basic-upload-loadbar.js' %}"></script> #}
+    <script>
+        $(function () {
+
+          $(".js-upload-photos").click(function () {
+            $("#fileupload").click();
+          });
+
+          $("#fileupload").fileupload({
+            dataType: 'json',
+            sequentialUploads: true,  /* 1. SEND THE FILES ONE BY ONE */
+            start: function (e) {  /* 2. WHEN THE UPLOADING PROCESS STARTS, SHOW THE MODAL */
+              $("#modal-progress").modal("show");
+            },
+            stop: function (e) {  /* 3. WHEN THE UPLOADING PROCESS FINALIZE, HIDE THE MODAL */
+              $("#modal-progress").modal("hide");
+            },
+            progressall: function (e, data) {  /* 4. UPDATE THE PROGRESS BAR */
+              var progress = parseInt(data.loaded / data.total * 100, 10);
+              var strProgress = progress + "%";
+              $(".progress-bar").css({"width": strProgress});
+              $(".progress-bar").text(strProgress);
+            },
+            done: function (e, data) {
+              if (data.result.is_valid) {
+                $("#gallery tbody").prepend(
+                  "<tr><td><a href='" + data.result.url + "'>" + data.result.name + "</a></td></tr>"
+                );
+                $('#upload-box').hide();
+                $('#create-art-section').show();
+                $("#image-box").prepend(
+                  "<img id='orig-imgx' style='height:100%;width:100%;object-fit:contain;max-height:60vh' src='" + data.result.url + "' alt='" + data.result.name + "'>"
+                );
+                var originalImageUrl = data.result.url;
+              }
+            }
+
+          });
+
+        });
+    </script>
+    {# GRAB THE UPLOADED IMAGE PATH AND RUN IT THROUGH THE DICE FUNCTION #}
+    <script>
+        $("#create-art").click(function () {
+          var originalImageUrl = $('#image-box img').attr('alt');
+          var numberOfDice = $('#number-of-dice').val();
+          var origin = window.location.origin; // https://whateverthissiteis.com
+          $("#loadMe").modal("show");
+          $.ajax({
+            type: "POST",
+            url: 'transform/',
+            data: {
+                'img': originalImageUrl,
+                'number_of_dice': numberOfDice
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#orig-imgx').hide();
+                $("#image-box").append(
+                  "<img id='dice-img' style='height:100%;width:100%;object-fit:contain;max-height:60vh' src='" + data.new_url + "'>"
+                );
+                $('#orig-imgx').attr('id', 'orig-img');
+                $("#loadMe").modal("hide");
+                $('#create-art-section').hide();
+                $('.buy-buttons').show();
+                $("#no-dice-content").text(data.number_of_dice);
+                $("#size-x-height").text(data.height_in_dice);
+                $("#size-x-width").text(data.width_in_dice);
+                changeValues();
+                $("#share-url").val(origin + "/share/" + data.image_id);
+                console.log(data.image_id);
+                return data;
+            }
+          });
+        })
+    </script>
+
+    {# SWITCH BETWEEN DICE IMAGE AND ORIGINAL IMAGE #}
+    <script>
+        $('body').on('click', '#image-box', function () {
+            if($('#orig-img').is(":hidden")) {
+                console.log("orig-img was hidden, now shouldn't be");
+                $('#orig-img').show();
+                $('#dice-img').hide();
+            }
+            else {
+                console.log("orig-img wasn't hidden, now should be");
+                $('#orig-img').hide();
+                $('#dice-img').show();
+            }
+        })
+
+    </script>
+
+    {# SHOW EXTRA SECTIONS #}
+    <script>
+        $("#buy-art").click(function () {
+            console.log("Clicked on buy art");
+            $('#dice-img-data').show();
+        })
+        $("#share-page").click(function () {
+            console.log("Clicked on share page");
+            $('#share-box').show();
+        })
+
+    </script>
+
+    {# COPY THE SHARE URL TEXT #}
+    <script>
+        function copyShareText() {
+          var copyText = document.getElementById("share-url");
+          copyText.select();
+          copyText.setSelectionRange(0, 99999)
+          document.execCommand("copy");
+        }
+
+        $("#copy-url").click(function (){
+            copyShareText.call();
+            $('#copy-url').attr('data-balloon-pos', 'up');
+        })
+
+        $("#copy-url").mouseout(function (){
+            $("#copy-url").removeAttr('data-balloon-pos', 'up');
+        })
+    </script>
+
+    {# DEAL WITH CHANGING THE TABLE DEPENDING ON DROPDOWN SELECTED #}
+    <script>
+    function changeValues() {
+        // get the identifier of the dice size selected (e.g. 8, 10, 12)
+        var str = "";
+        $( "select option:selected" ).each(function() {
+            str += $( this ).text() + " ";
+        }); // set the variable 'str' to the value of the dropdown
+        var str = str.trim(); // remove trailing space
+
+        // change the cost per dice shown
+        var divCost = "size-" + str + "-cost"; // this is the div identifier containing the cost
+        var cost = $( "#" + divCost ).text() + "p"; // this gets the cost from the above div
+        $( "#dice-cost-content" ).text( cost ); // change the contents of the shown div to the above
+
+        // change the total price shown
+        var totalDice = $( "#no-dice-content" ).text(); // get the total no. of dice
+        var totalDice = parseInt(totalDice); // convert text to integer
+        var cost = parseInt(cost); // and again
+        var totalCost = totalDice * cost / 100; // multiply above by the price per dice
+        var totalCost = totalCost.toFixed(2); // ensure formatted to 2dp
+        $( "#dice-f-price-content" ).text( "£" + totalCost ); // change the contents of the div
+
+        // change the height of piece shown
+        var height = $( "#size-x-height" ).text(); // get the height from the hidden div
+        var height = parseInt(height); // convert text to integer
+        var str = parseInt(str); // as above
+        var heightInM = height * str / 1000;
+        $( "#dice-height-content" ).text( heightInM + "m" ); // change the contents of the div
+
+        // change the width of piece shown
+        var width = $( "#size-x-width" ).text(); // get the width from the hidden div
+        var width = parseInt(width); // convert text to integer
+        var str = parseInt(str); // as above
+        var heightInM = width * str / 1000;
+        $( "#dice-width-content" ).text( heightInM + "m" ); // change the contents of the div
+
+        // change the data on the first buy button
+        $("#buy-dice").text("Buy " + totalDice + " dice for £" + totalCost);
+    };
+    $( "select" ).change(changeValues);
+    </script>
+
+    {# GRAB CSRF TOKEN AND ADD IT TO POST REQUESTS #}
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
+    </script>
+
+{% endblock %}
