@@ -9,6 +9,10 @@
 ## Video demonstration
 See a demo of how it works [here](https://streamable.com/xk3k1u).
 
+The images demonstrated in the video are [here](https://www.dicerrr.com/share/xxrH3dSk) and [here](https://www.dicerrr.com/share/GSw4sa3w).
+
+Try opening the images in a separate tab and zooming in to see the detail of the dice!
+
 ## Example pictures
 (to be added)
 
