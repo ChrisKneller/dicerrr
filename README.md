@@ -20,4 +20,4 @@ Try opening the images in a separate tab and zooming in to see the detail of the
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
-(GPL-3.0)[https://github.com/ChrisKneller/dicerrr/blob/master/LICENSE]
+[GPL-3.0](https://github.com/ChrisKneller/dicerrr/blob/master/LICENSE)
