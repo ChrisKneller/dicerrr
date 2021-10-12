@@ -20,7 +20,7 @@ mysql==0.0.2
 mysqlclient==1.4.1
 networkx==2.2
 numpy==1.16.1
-opencv-python==4.0.0.21
+opencv-python==4.1.1.26
 parso==0.3.3
 pexpect==4.6.0
 pickleshare==0.7.5
