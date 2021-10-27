@@ -4,7 +4,7 @@ boto3==1.9.91
 botocore==1.12.91
 cloudpickle==0.7.0
 cycler==0.10.0
-dask==1.1.1
+dask==2021.10.0
 decorator==4.3.2
 Django==2.2.10
 django-crispy-forms==1.7.2
